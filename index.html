@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Картотека терминов — ML и смежные области</title>
+<style>
+  :root{
+    --bg: #1E1B16;
+    --bg-drawer: #171410;
+    --wood-edge: #3A2E22;
+    --card: #F5EFE1;
+    --card-edge: #C9B99A;
+    --ink: #2A2119;
+    --ink-soft: #6B5D48;
+    --stamp: #A83A32;
+    --stamp-soft: #C77A6F;
+    --teal: #33625A;
+    --hole: #1E1B16;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color: transparent;}
+  html,body{margin:0;padding:0; width:100%; overflow-x:hidden;}
+  body{
+    background: var(--bg);
+    font-family: Georgia, 'Times New Roman', serif;
+    color: var(--card);
+    min-height:100vh;
+    padding: 20px 12px 48px;
+  }
+  .wrap{ max-width: 720px; margin: 0 auto; }
+
+  header{ text-align:center; margin-bottom: 18px; }
+  .eyebrow{
+    font-family: 'Courier New', Courier, monospace;
+    letter-spacing: 0.2em;
+    font-size: 10px;
+    color: var(--stamp-soft);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  h1{
+    font-size: clamp(22px, 6vw, 34px);
+    margin: 0 0 6px;
+    font-weight: 700;
+    color: #F5EFE1;
+  }
+  .sub{
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 12px;
+    color: #A79A82;
+    line-height: 1.5;
+  }
+
+  .mode-switch{ display:flex; gap: 8px; margin: 18px 0 12px; }
+  .mode-btn{
+    flex: 1;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 13px;
+    font-weight: bold;
+    letter-spacing: 0.04em;
+    padding: 12px 8px;
+    border-radius: 8px;
+    border: 2px solid var(--wood-edge);
+    background: var(--bg-drawer);
+    color: #A79A82;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .mode-btn.active{ background: var(--stamp); border-color: var(--stamp); color: #F5EFE1; }
+
+  .tabs{ display:flex; gap: 6px; flex-wrap: wrap; margin: 4px 0 10px; }
+  .tab{
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 12px;
+    letter-spacing: 0.02em;
+    background: var(--bg-drawer);
+    color: #A79A82;
+    border: 1.5px solid var(--wood-edge);
+    padding: 8px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    flex: 1 1 auto;
+    text-align:center;
+    min-width: 0;
+  }
+  .tab:hover{ color: #F5EFE1; }
+  .tab.active{ background: var(--card); color: var(--ink); border-color: var(--card-edge); font-weight: bold; }
+
+  .drawer{ background: var(--card); border: 2px solid var(--card-edge); border-radius: 8px; padding: 14px; }
+  .drawer-label{
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 11px; color: var(--ink-soft); letter-spacing: 0.06em; text-transform: uppercase;
+    margin-bottom: 12px; border-bottom: 1px dashed var(--card-edge); padding-bottom: 8px;
+  }
+
+  .list{ display: flex; flex-direction: column; gap: 10px; }
+
+  .index-card{ background: #FBF8F0; border: 1px solid var(--card-edge); border-radius: 4px; overflow: hidden; }
+  .index-card-head{ display:flex; align-items:center; gap: 10px; padding: 13px 14px; cursor: pointer; user-select:none;
+    width: 100%; text-align: left; background: none; border: none; font: inherit; -webkit-appearance: none; appearance: none; }
+  .hole{ width: 10px; height: 10px; border-radius: 50%; background: var(--hole);
+    box-shadow: inset 0 0 0 2px #FBF8F0, 0 0 0 1px var(--card-edge); flex: none; }
+  .term-en{ font-family: 'Courier New', Courier, monospace; font-size: 15px; font-weight: bold; color: var(--ink); flex: 1; word-break: break-word; }
+  .caret{ font-family: 'Courier New', Courier, monospace; color: var(--ink-soft); font-size: 13px; transition: transform 0.2s ease; flex: none; }
+  .index-card.open .caret{ transform: rotate(90deg); }
+
+  .index-card-body{ max-height: 0; overflow: hidden; transition: max-height 0.25s ease; }
+  .index-card.open .index-card-body{ border-top: 1px dashed var(--card-edge); }
+  .body-inner{ padding: 12px 14px 14px 30px; }
+  .def-en{ font-family: Georgia, serif; font-size: 14px; line-height: 1.5; color: var(--ink); margin: 0 0 12px; }
+  .def-en b{ color: var(--stamp); font-family: 'Courier New', monospace; }
+  .def-ru{ font-family: Georgia, serif; font-style: italic; font-size: 14px; line-height: 1.5; color: var(--teal);
+    margin: 0; padding-top: 10px; border-top: 1px solid var(--card-edge); }
+  .def-ru b{ color: var(--teal); font-style: normal; }
+
+  .study{ display:none; }
+  .study.active{ display:block; }
+  .list-mode.hidden{ display:none; }
+
+  .progress{ font-family: 'Courier New', Courier, monospace; font-size: 12px; color: var(--ink-soft); text-align:center; margin-bottom: 10px; }
+  .progress-bar{ height: 4px; background: var(--card-edge); border-radius: 2px; overflow: hidden; margin-bottom: 18px; }
+  .progress-fill{ height: 100%; background: var(--stamp); transition: width 0.2s ease; }
+
+  .study-card{
+    background: #FBF8F0; border: 1px solid var(--card-edge); border-radius: 8px;
+    min-height: 220px; padding: 28px 20px;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; cursor: pointer; gap: 16px;
+    width: 100%; font: inherit; -webkit-appearance: none; appearance: none;
+  }
+  .study-term{ font-family: 'Courier New', Courier, monospace; font-size: clamp(20px, 6vw, 26px); font-weight: bold; color: var(--ink); }
+  .study-hint{ font-family: 'Courier New', Courier, monospace; font-size: 11px; color: var(--ink-soft); letter-spacing: 0.05em; }
+  .study-answer{ display:none; width:100%; text-align:left; }
+  .study-card.revealed .study-hint{ display:none; }
+  .study-card.revealed .study-answer{ display:block; }
+  .study-card.revealed{ align-items: stretch; text-align:left; cursor: default; }
+  .study-card.revealed .study-term{ text-align:center; }
+
+  .nav-row{ display:flex; gap: 10px; margin-top: 14px; }
+  .nav-btn{
+    flex:1; font-family: 'Courier New', Courier, monospace; font-size: 14px; font-weight: bold;
+    padding: 14px 8px; border-radius: 8px; border: 2px solid var(--wood-edge);
+    background: var(--bg-drawer); color: #F5EFE1; cursor: pointer; user-select:none;
+  }
+  .nav-btn:active{ background: var(--stamp); border-color: var(--stamp); }
+  .nav-btn:disabled{ opacity: 0.35; cursor: default; }
+
+  footer{ text-align:center; margin-top: 22px; font-family: 'Courier New', Courier, monospace; font-size: 10px; color: #6B5D48; letter-spacing: 0.04em; }
+
+  @media (max-width: 420px){
+    .mode-btn{ font-size: 12px; padding: 11px 6px; }
+    .tab{ font-size: 11px; padding: 7px 8px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Card catalog · 100 terms · 5 drawers</div>
+    <h1>Картотека терминов</h1>
+    <div class="sub">ML, компьютерное зрение, NLP, управление и моделирование — на английском с переводом</div>
+  </header>
+
+  <div class="mode-switch">
+    <button class="mode-btn active" id="btnListMode">📋 Список</button>
+    <button class="mode-btn" id="btnStudyMode">🎴 Карточки</button>
+  </div>
+
+  <nav class="tabs" id="tabs"></nav>
+
+  <div class="list-mode" id="listMode">
+    <div class="drawer">
+      <div class="drawer-label" id="drawerLabel">Ящик 1 из 5</div>
+      <div class="list" id="list"></div>
+    </div>
+  </div>
+
+  <div class="study" id="studyMode">
+    <div class="progress" id="progress">1 / 20</div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:5%"></div></div>
+    <button type="button" class="study-card" id="studyCard">
+      <div class="study-term" id="studyTerm">Term</div>
+      <div class="study-hint" id="studyHint">нажми, чтобы открыть определение</div>
+      <div class="study-answer" id="studyAnswer"></div>
+    </button>
+    <div class="nav-row">
+      <button class="nav-btn" id="btnPrev">← Пред.</button>
+      <button class="nav-btn" id="btnNext">След. →</button>
+    </div>
+  </div>
+
+  <footer>список — читай всё подряд · карточки — проверяй себя по одному слову</footer>
+</div>
+
+<script>
+const DATA = [
+  { name: "Основы", terms: [
+    ["Algorithm","Алгоритм","A step-by-step procedure for solving a problem or performing a computation.","Пошаговая процедура решения задачи или выполнения вычисления."],
+    ["Dataset","Набор данных","A collection of data used for training or testing a model.","Совокупность данных, используемая для обучения или тестирования модели."],
+    ["Feature","Признак","An individual measurable property or input variable used by a model.","Отдельное измеримое свойство или входная переменная, используемая моделью."],
+    ["Label","Метка","The correct output or target value associated with a data point.","Правильный выходной или целевой результат, связанный с объектом данных."],
+    ["Variable","Переменная","A symbol that represents a value that can change.","Символ, представляющий значение, которое может изменяться."],
+    ["Matrix","Матрица","A rectangular array of numbers arranged in rows and columns.","Прямоугольный массив чисел, расположенных по строкам и столбцам."],
+    ["Vector","Вектор","An ordered list of numbers representing a point or direction in space.","Упорядоченный список чисел, представляющий точку или направление в пространстве."],
+    ["Tensor","Тензор","A multi-dimensional array that generalizes vectors and matrices.","Многомерный массив, обобщающий понятия вектора и матрицы."],
+    ["Gradient","Градиент","A vector of partial derivatives showing the direction of steepest increase of a function.","Вектор частных производных, показывающий направление наибольшего роста функции."],
+    ["Derivative","Производная","A measure of how a function changes as its input changes.","Мера того, как меняется функция при изменении её входного значения."],
+    ["Probability","Вероятность","A measure of how likely an event is to occur.","Мера того, насколько вероятно наступление события."],
+    ["Distribution","Распределение","A function describing how values of a variable are spread or occur.","Функция, описывающая, как распределены значения переменной."],
+    ["Model","Модель","A mathematical representation that maps inputs to outputs based on learned patterns.","Математическое представление, преобразующее входные данные в выходные на основе выученных закономерностей."],
+    ["Parameter","Параметр","A value learned by the model during training, such as a weight.","Значение, которое модель усваивает в процессе обучения, например вес."],
+    ["Hyperparameter","Гиперпараметр","A configuration value set before training that controls the learning process.","Настроечное значение, задаваемое до обучения, которое управляет процессом обучения."],
+    ["Regression","Регрессия","A method for predicting a continuous numeric value from input data.","Метод предсказания непрерывного числового значения на основе входных данных."],
+    ["Classification","Классификация","A method for predicting which category or class an input belongs to.","Метод предсказания, к какой категории или классу относится входной объект."],
+    ["Supervised learning","Обучение с учителем","A type of learning where the model is trained on labeled input-output pairs.","Тип обучения, при котором модель обучается на размеченных парах «вход-выход»."],
+    ["Unsupervised learning","Обучение без учителя","A type of learning where the model finds patterns in data without labels.","Тип обучения, при котором модель находит закономерности в данных без разметки."],
+    ["Reinforcement learning","Обучение с подкреплением","A type of learning where an agent learns by receiving rewards or penalties for actions.","Тип обучения, при котором агент учится, получая награды или штрафы за действия."]
+  ]},
+  { name: "Классический ML", terms: [
+    ["Linear regression","Линейная регрессия","A method that models the relationship between variables using a straight line.","Метод, моделирующий зависимость между переменными с помощью прямой линии."],
+    ["Logistic regression","Логистическая регрессия","A classification method that estimates the probability of a binary outcome.","Метод классификации, оценивающий вероятность бинарного исхода."],
+    ["Decision tree","Дерево решений","A model that splits data into branches based on feature values to make predictions.","Модель, разбивающая данные на ветви по значениям признаков для получения предсказаний."],
+    ["Random forest","Случайный лес","An ensemble of decision trees that combines their predictions for better accuracy.","Ансамбль деревьев решений, объединяющий их предсказания для повышения точности."],
+    ["Gradient boosting","Градиентный бустинг","A technique that builds models sequentially, each correcting the errors of the previous one.","Метод, последовательно строящий модели, каждая из которых исправляет ошибки предыдущей."],
+    ["Support vector machine","Метод опорных векторов","A classifier that finds the optimal boundary separating classes of data.","Классификатор, находящий оптимальную границу, разделяющую классы данных."],
+    ["K-nearest neighbors","Метод k ближайших соседей","A method that classifies a point based on the classes of its closest neighbors.","Метод, классифицирующий точку на основе классов её ближайших соседей."],
+    ["Clustering","Кластеризация","The task of grouping similar data points together without predefined labels.","Задача группировки похожих объектов данных без заранее заданных меток."],
+    ["Dimensionality reduction","Снижение размерности","A technique for reducing the number of features while preserving important information.","Метод уменьшения числа признаков с сохранением важной информации."],
+    ["Overfitting","Переобучение","When a model learns the training data too well, including noise, and performs poorly on new data.","Ситуация, когда модель слишком точно подстраивается под обучающие данные, включая шум, и плохо работает на новых данных."],
+    ["Underfitting","Недообучение","When a model is too simple to capture the underlying pattern in the data.","Ситуация, когда модель слишком проста, чтобы уловить закономерность в данных."],
+    ["Cross-validation","Кросс-валидация","A technique for assessing model performance by splitting data into multiple train/test folds.","Метод оценки качества модели путём разбиения данных на несколько обучающих/тестовых частей."],
+    ["Train/test split","Разбиение на выборки","Dividing a dataset into separate parts for training and evaluating a model.","Разделение набора данных на части для обучения и оценки модели."],
+    ["Regularization","Регуляризация","A technique that discourages overly complex models to reduce overfitting.","Метод, ограничивающий сложность модели для снижения переобучения."],
+    ["Feature engineering","Формирование признаков","The process of creating or transforming input variables to improve model performance.","Процесс создания или преобразования входных переменных для улучшения качества модели."],
+    ["Accuracy","Точность (доля верных ответов)","The proportion of correct predictions made by a model.","Доля правильных предсказаний, сделанных моделью."],
+    ["Precision","Прецизионность","The proportion of positive predictions that are actually correct.","Доля предсказанных положительных случаев, которые оказались верными."],
+    ["Recall","Полнота","The proportion of actual positives that were correctly identified.","Доля реальных положительных случаев, которые были правильно определены."],
+    ["F1 score","F1-мера","A metric combining precision and recall into a single value.","Метрика, объединяющая точность и полноту в одно значение."],
+    ["Loss function","Функция потерь","A function that measures how far a model's predictions are from the true values.","Функция, измеряющая, насколько предсказания модели отличаются от истинных значений."]
+  ]},
+  { name: "Глубокое обучение", terms: [
+    ["Neural network","Нейронная сеть","A model composed of connected layers of nodes inspired by the brain.","Модель, состоящая из связанных слоёв узлов, вдохновлённая устройством мозга."],
+    ["Neuron","Нейрон","A basic computational unit in a neural network that processes and passes signals.","Базовая вычислительная единица нейронной сети, обрабатывающая и передающая сигналы."],
+    ["Weight","Вес","A parameter that determines the strength of a connection between neurons.","Параметр, определяющий силу связи между нейронами."],
+    ["Activation function","Функция активации","A function applied to a neuron's output to introduce non-linearity.","Функция, применяемая к выходу нейрона для внесения нелинейности."],
+    ["ReLU","ReLU-функция","An activation function that outputs zero for negative inputs and the input itself otherwise.","Функция активации, дающая ноль на отрицательных входах и сам вход — на положительных."],
+    ["Softmax","Софтмакс","A function that converts a vector of numbers into a probability distribution.","Функция, преобразующая вектор чисел в распределение вероятностей."],
+    ["Backpropagation","Обратное распространение ошибки","The algorithm used to compute gradients and update weights in a neural network.","Алгоритм вычисления градиентов и обновления весов в нейронной сети."],
+    ["Epoch","Эпоха","One complete pass through the entire training dataset.","Один полный проход по всему обучающему набору данных."],
+    ["Batch size","Размер батча","The number of training examples used in one update of the model.","Количество обучающих примеров, используемых при одном обновлении модели."],
+    ["Learning rate","Скорость обучения","A parameter that controls how much the model's weights change during training.","Параметр, определяющий, насколько сильно меняются веса модели в процессе обучения."],
+    ["Optimizer","Оптимизатор","An algorithm that updates model parameters to minimize the loss function.","Алгоритм, обновляющий параметры модели для минимизации функции потерь."],
+    ["Dropout","Дропаут","A regularization technique that randomly disables neurons during training.","Метод регуляризации, случайно отключающий нейроны во время обучения."],
+    ["Convolutional neural network","Свёрточная нейронная сеть","A network architecture specialized for processing grid-like data such as images.","Архитектура сети, специализированная для обработки данных в виде сетки, например изображений."],
+    ["Convolution","Свёртка","An operation that applies a filter across input data to detect patterns.","Операция, применяющая фильтр к входным данным для обнаружения закономерностей."],
+    ["Pooling layer","Слой пулинга","A layer that reduces the spatial size of data by summarizing regions.","Слой, уменьшающий пространственный размер данных путём обобщения областей."],
+    ["Recurrent neural network","Рекуррентная нейронная сеть","A network architecture designed to process sequential data using internal memory.","Архитектура сети, предназначенная для обработки последовательных данных с использованием внутренней памяти."],
+    ["Long short-term memory","LSTM (долгая краткосрочная память)","A type of recurrent network designed to remember information over long sequences.","Тип рекуррентной сети, способной запоминать информацию на длинных последовательностях."],
+    ["Attention mechanism","Механизм внимания","A technique that lets a model focus on the most relevant parts of the input.","Механизм, позволяющий модели фокусироваться на наиболее значимых частях входных данных."],
+    ["Transformer","Трансформер","A neural network architecture based entirely on attention mechanisms.","Архитектура нейронной сети, полностью построенная на механизмах внимания."],
+    ["Embedding","Эмбеддинг","A dense vector representation of data such as words or items.","Плотное векторное представление данных, например слов или объектов."]
+  ]},
+  { name: "Зрение и язык", terms: [
+    ["Computer vision","Компьютерное зрение","A field focused on enabling computers to interpret and understand visual information.","Область, направленная на то, чтобы научить компьютеры интерпретировать визуальную информацию."],
+    ["Image segmentation","Сегментация изображений","The task of dividing an image into meaningful regions or objects.","Задача разбиения изображения на осмысленные области или объекты."],
+    ["Object detection","Обнаружение объектов","The task of identifying and locating objects within an image.","Задача выявления и определения местоположения объектов на изображении."],
+    ["Image classification","Классификация изображений","The task of assigning a label to an entire image.","Задача присвоения метки всему изображению целиком."],
+    ["Feature map","Карта признаков","The output of applying a filter to an input in a convolutional network.","Результат применения фильтра к входным данным в свёрточной сети."],
+    ["Edge detection","Выделение границ","A technique for identifying boundaries within an image.","Метод выявления границ объектов на изображении."],
+    ["Optical flow","Оптический поток","The pattern of apparent motion of objects between consecutive video frames.","Картина видимого движения объектов между последовательными кадрами видео."],
+    ["Bounding box","Ограничивающая рамка","A rectangular box drawn around an object to indicate its location in an image.","Прямоугольная рамка, обозначающая местоположение объекта на изображении."],
+    ["Data augmentation","Аугментация данных","A technique that creates modified copies of training data to increase dataset diversity.","Метод создания изменённых копий обучающих данных для увеличения разнообразия набора данных."],
+    ["Natural language processing","Обработка естественного языка","A field focused on enabling computers to understand and generate human language.","Область, направленная на то, чтобы научить компьютеры понимать и создавать человеческий язык."],
+    ["Tokenization","Токенизация","The process of splitting text into smaller units such as words or subwords.","Процесс разбиения текста на более мелкие единицы, такие как слова или части слов."],
+    ["Language model","Языковая модель","A model trained to predict or generate sequences of text.","Модель, обученная предсказывать или генерировать последовательности текста."],
+    ["Sentiment analysis","Анализ тональности","The task of determining the emotional tone expressed in a piece of text.","Задача определения эмоциональной окраски текста."],
+    ["Named entity recognition","Распознавание именованных сущностей","The task of identifying names of people, places, or organizations in text.","Задача выявления имён людей, названий мест или организаций в тексте."],
+    ["Bag of words","Мешок слов","A text representation method that counts word occurrences while ignoring order and grammar.","Метод представления текста, учитывающий частоту слов без учёта порядка и грамматики."],
+    ["N-gram","N-грамма","A contiguous sequence of n items, such as words, from a given text.","Непрерывная последовательность из n элементов, например слов, взятая из текста."],
+    ["Stop words","Стоп-слова","Common words such as \"the\" or \"and\" that are often removed before text analysis.","Часто встречающиеся слова, такие как «the» или «and», которые обычно удаляют перед анализом текста."],
+    ["Corpus","Корпус текстов","A large structured collection of texts used for language analysis or training models.","Большая структурированная коллекция текстов, используемая для анализа языка или обучения моделей."],
+    ["Speech recognition","Распознавание речи","The task of converting spoken language into written text.","Задача преобразования устной речи в письменный текст."],
+    ["Optical character recognition","Оптическое распознавание символов","The technology that converts images of text into machine-readable text.","Технология, преобразующая изображения текста в текст, пригодный для машинной обработки."]
+  ]},
+  { name: "Управление и моделирование", terms: [
+    ["Control system","Система управления","A system designed to manage, command, or regulate the behavior of a device or process.","Система, предназначенная для управления и регулирования поведения устройства или процесса."],
+    ["Feedback loop","Контур обратной связи","A system where the output is fed back as input to adjust future behavior.","Система, в которой выходной сигнал подаётся обратно на вход для корректировки последующего поведения."],
+    ["PID controller","ПИД-регулятор","A control mechanism that adjusts output based on proportional, integral, and derivative terms.","Механизм управления, корректирующий выход на основе пропорциональной, интегральной и дифференциальной составляющих."],
+    ["State space","Пространство состояний","A mathematical model representing all possible states of a dynamic system.","Математическая модель, представляющая все возможные состояния динамической системы."],
+    ["Sensor","Датчик","A device that detects and measures a physical property and converts it to a signal.","Устройство, обнаруживающее и измеряющее физическую величину и преобразующее её в сигнал."],
+    ["Actuator","Исполнительный механизм","A device that produces physical movement or action based on a control signal.","Устройство, создающее физическое движение или действие на основе управляющего сигнала."],
+    ["Kalman filter","Фильтр Калмана","An algorithm that estimates the state of a system from noisy measurements.","Алгоритм, оценивающий состояние системы по зашумлённым измерениям."],
+    ["Robotics","Робототехника","The field concerned with designing, building, and operating robots.","Область, связанная с проектированием, созданием и эксплуатацией роботов."],
+    ["Autonomous system","Автономная система","A system capable of performing tasks without continuous human control.","Система, способная выполнять задачи без постоянного контроля со стороны человека."],
+    ["Trajectory","Траектория","The path that a moving object or system follows over time.","Путь, по которому движется объект или система с течением времени."],
+    ["Stability","Устойчивость","The property of a system to return to equilibrium after a disturbance.","Свойство системы возвращаться в равновесие после возмущения."],
+    ["Simulation","Моделирование (симуляция)","The use of a model to imitate the behavior of a real-world system over time.","Использование модели для имитации поведения реальной системы во времени."],
+    ["Optimization","Оптимизация","The process of finding the best solution according to some defined criteria.","Процесс поиска наилучшего решения по заданным критериям."],
+    ["Objective function","Целевая функция","The function that an optimization process tries to maximize or minimize.","Функция, которую процесс оптимизации стремится максимизировать или минимизировать."],
+    ["Constraint","Ограничение","A condition that a solution must satisfy in an optimization problem.","Условие, которому должно удовлетворять решение в задаче оптимизации."],
+    ["Monte Carlo method","Метод Монте-Карло","A technique that uses repeated random sampling to estimate numerical results.","Метод, использующий многократную случайную выборку для оценки числовых результатов."],
+    ["Time series","Временной ряд","A sequence of data points collected or recorded at successive points in time.","Последовательность данных, собранных или зафиксированных в последовательные моменты времени."],
+    ["Anomaly detection","Обнаружение аномалий","The task of identifying data points that differ significantly from the norm.","Задача выявления данных, значительно отклоняющихся от нормы."],
+    ["Inference","Инференс (вывод)","The process of using a trained model to make predictions on new data.","Процесс использования обученной модели для получения предсказаний на новых данных."],
+    ["Pipeline","Пайплайн","A sequence of automated data processing and modeling steps.","Последовательность автоматизированных этапов обработки данных и моделирования."]
+  ]}
+];
+
+let activeCat = 0;
+let mode = 'list';
+let studyIdx = 0;
+
+const tabsEl = document.getElementById('tabs');
+const listEl = document.getElementById('list');
+const drawerLabelEl = document.getElementById('drawerLabel');
+const listModeEl = document.getElementById('listMode');
+const studyModeEl = document.getElementById('studyMode');
+const btnListMode = document.getElementById('btnListMode');
+const btnStudyMode = document.getElementById('btnStudyMode');
+
+const studyCard = document.getElementById('studyCard');
+const studyTerm = document.getElementById('studyTerm');
+const studyAnswer = document.getElementById('studyAnswer');
+const progressEl = document.getElementById('progress');
+const progressFill = document.getElementById('progressFill');
+const btnPrev = document.getElementById('btnPrev');
+const btnNext = document.getElementById('btnNext');
+
+function renderTabs(){
+  tabsEl.innerHTML = '';
+  DATA.forEach((cat, idx) => {
+    const btn = document.createElement('button');
+    btn.className = 'tab' + (idx === activeCat ? ' active' : '');
+    btn.textContent = cat.name;
+    btn.addEventListener('click', () => {
+      activeCat = idx;
+      studyIdx = 0;
+      renderTabs();
+      if (mode === 'list') renderList(); else renderStudy();
+    });
+    tabsEl.appendChild(btn);
+  });
+}
+
+function renderList(){
+  const cat = DATA[activeCat];
+  drawerLabelEl.textContent = 'Ящик ' + (activeCat + 1) + ' из ' + DATA.length + ' — ' + cat.name;
+  listEl.innerHTML = '';
+  cat.terms.forEach(([termEn, termRu, defEn, defRu]) => {
+    const card = document.createElement('div');
+    card.className = 'index-card';
+
+    const head = document.createElement('button');
+    head.type = 'button';
+    head.className = 'index-card-head';
+    head.innerHTML = '<span class="hole"></span><span class="term-en">' + termEn + '</span><span class="caret">▶</span>';
+
+    const body = document.createElement('div');
+    body.className = 'index-card-body';
+    body.innerHTML =
+      '<div class="body-inner">' +
+        '<p class="def-en"><b>' + termEn + '</b> — ' + defEn + '</p>' +
+        '<p class="def-ru"><b>' + termRu + '</b> — ' + defRu + '</p>' +
+      '</div>';
+
+    head.addEventListener('click', () => {
+      const willOpen = !card.classList.contains('open');
+      card.classList.toggle('open', willOpen);
+      body.style.maxHeight = willOpen ? body.scrollHeight + 'px' : 0;
+    });
+
+    card.appendChild(head);
+    card.appendChild(body);
+    listEl.appendChild(card);
+  });
+}
+
+function renderStudy(){
+  const cat = DATA[activeCat];
+  const total = cat.terms.length;
+  const [termEn, termRu, defEn, defRu] = cat.terms[studyIdx];
+
+  studyCard.classList.remove('revealed');
+  studyTerm.textContent = termEn;
+  studyAnswer.innerHTML =
+    '<p class="def-en"><b>' + termEn + '</b> — ' + defEn + '</p>' +
+    '<p class="def-ru"><b>' + termRu + '</b> — ' + defRu + '</p>';
+
+  progressEl.textContent = (studyIdx + 1) + ' / ' + total + '  ·  ' + cat.name;
+  progressFill.style.width = Math.round(((studyIdx + 1) / total) * 100) + '%';
+
+  btnPrev.disabled = studyIdx === 0;
+  btnNext.disabled = studyIdx === total - 1;
+}
+
+studyCard.addEventListener('click', () => {
+  studyCard.classList.toggle('revealed');
+});
+
+btnPrev.addEventListener('click', () => {
+  if (studyIdx > 0){ studyIdx--; renderStudy(); }
+});
+btnNext.addEventListener('click', () => {
+  if (studyIdx < DATA[activeCat].terms.length - 1){ studyIdx++; renderStudy(); }
+});
+
+btnListMode.addEventListener('click', () => {
+  mode = 'list';
+  btnListMode.classList.add('active');
+  btnStudyMode.classList.remove('active');
+  listModeEl.classList.remove('hidden');
+  studyModeEl.classList.remove('active');
+  renderList();
+});
+btnStudyMode.addEventListener('click', () => {
+  mode = 'study';
+  btnStudyMode.classList.add('active');
+  btnListMode.classList.remove('active');
+  listModeEl.classList.add('hidden');
+  studyModeEl.classList.add('active');
+  studyIdx = 0;
+  renderStudy();
+});
+
+renderTabs();
+renderList();
+</script>
+</body>
+</html>
